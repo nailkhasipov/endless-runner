@@ -13,7 +13,94 @@
 <canvas id="gameCanvas" width="480" height="320"></canvas>
 
 <script>
-	// JavaScript code goes here
+  var canvas = document.getElementById("gameCanvas");
+  var ctx = canvas.getContext("2d");
+
+  var gravity = 0.5;
+  var velocity = 0;
+  var player = {
+    x: 100,
+    y: 200,
+    width: 50,
+    height: 50,
+    jumping: false
+  };
+
+  document.addEventListener('keydown', keyDownHandler, false);
+  document.addEventListener('keyup', keyUpHandler, false);
+
+  var xPressed = false;
+
+  function keyDownHandler(event) {
+    if(event.keyCode == 88 && player.jumping == false) {
+      startJump();
+      xPressed = true;
+    }
+  }
+
+  function keyUpHandler(event) {
+    if(event.keyCode == 88) {
+      endJump();
+      xPressed = false;
+    }
+  }
+
+  function startJump() {
+    if ( !player.jumping ) {
+      velocity = -12;
+      player.jumping = true;
+    }
+  }
+
+  function endJump() {
+    if(velocity < -6.0) velocity = -6.0;
+  }
+
+  function update(progress) {
+    velocity += gravity;
+    player.y += velocity;
+
+    if ( player.y > 200 ) {
+      player.y = 200;
+      velocity = 0;
+      player.jumping = false;
+    }
+  }
+
+  function drawGround() {
+    ctx.beginPath();
+    ctx.rect(0, 250, 480, 120);
+    ctx.fillStyle = "#8f563b";
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function drawPlayer() {
+    ctx.beginPath();
+    ctx.rect(player.x, player.y, player.width, player.height);
+    ctx.fillStyle = "#6abe30";
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawGround();
+    drawPlayer();
+  }
+
+  function loop(timestamp) {
+    var progress = timestamp - lastRender;
+
+    update(progress);
+    draw();
+
+    lastRender = timestamp;
+    window.requestAnimationFrame(loop);
+  }
+  var lastRender = 0;
+  window.requestAnimationFrame(loop);
 </script>
 
 </body>
