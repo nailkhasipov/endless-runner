@@ -20,6 +20,7 @@
   var velocity = 0;
   var obstacles = [];
   var lastTImeObstacle = 1000;
+  var isGameOver = false;
   var player = {
     x: 100,
     y: 200,
@@ -59,31 +60,51 @@
   }
 
   function update(progress) {
-    velocity += gravity;
-    player.y += velocity;
+    if ( !isGameOver ) {
+      velocity += gravity;
+      player.y += velocity;
 
-    // Gravity
-    if ( player.y > 200 ) {
-      player.y = 200;
-      velocity = 0;
-      player.jumping = false;
-    }
-
-    // generate obstacles
-    lastTImeObstacle = lastTImeObstacle - 10;
-    if ( lastTImeObstacle <= 0 ) {
-      lastTImeObstacle = Math.random() * (700 - 300) + 300;
-      var obstacle = {x: 480, y: 200, width: 25, height: 50, counted: false};
-      obstacles.push(obstacle);
-    }
-
-    // move obstacles
-    obstacles.forEach(function(obstacle, i) {
-      obstacle.x = obstacle.x - 10;
-      if ( obstacle.x < 0 ) {
-        obstacles.splice(i, 1);
+      // Gravity
+      if ( player.y > 200 ) {
+        player.y = 200;
+        velocity = 0;
+        player.jumping = false;
       }
-    });
+
+      // generate obstacles
+      lastTImeObstacle = lastTImeObstacle - 10;
+      if ( lastTImeObstacle <= 0 ) {
+        lastTImeObstacle = Math.random() * (700 - 400) + 400;
+        var obstacle = {x: 480, y: 200, width: 25, height: 50, counted: false};
+        obstacles.push(obstacle);
+      }
+
+      // move obstacles
+      obstacles.forEach(function(obstacle, i) {
+        obstacle.x = obstacle.x - 10;
+        if ( obstacle.x < 0 ) {
+          obstacles.splice(i, 1);
+        }
+      });
+
+      // checks collisions with player
+      obstacles.forEach(function(obstacle, i) {
+        if (CheckCollision(player.x,player.y,player.width,player.height,
+          obstacle.x,obstacle.y,obstacle.width,obstacle.height) ) {
+            isGameOver = true;
+        }
+      });
+    }
+    else {
+        document.location.reload();
+    }
+  }
+
+  function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2) {
+    return x1 < x2+w2 &&
+           x2 < x1+w1 &&
+           y1 < y2+h2 &&
+           y2 < y1+h1;
   }
 
   function drawGround() {
